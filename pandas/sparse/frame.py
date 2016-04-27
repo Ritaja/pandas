@@ -232,8 +232,8 @@ class SparseDataFrame(DataFrame):
         data = dict((k, v.to_dense()) for k, v in compat.iteritems(self))
         return DataFrame(data, index=self.index, columns=self.columns)
 
-    def astype(self, dtype):
-        raise NotImplementedError
+    #def astype(self, dtype,):
+        #raise NotImplementedError
 
     def copy(self, deep=True):
         """
@@ -495,10 +495,15 @@ class SparseDataFrame(DataFrame):
             new_data, index=self.index, columns=union,
             default_fill_value=self.default_fill_value).__finalize__(self)
 
-    def _combine_const(self, other, func):
+    def _combine_const(self, other, func, raise_on_error=True):
         new_data = {}
-        for col, series in compat.iteritems(self):
-            new_data[col] = func(series, other)
+        try:
+            for col, series in compat.iteritems(self):
+                new_data[col] = func(series, other)
+
+        except Exception as err:
+            if raise_on_error:
+                raise TypeError('Could not operate on data %s' % str(err))
 
         return self._constructor(
             data=new_data, index=self.index, columns=self.columns,

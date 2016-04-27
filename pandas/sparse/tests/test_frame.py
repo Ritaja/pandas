@@ -566,6 +566,13 @@ class TestSparseDataFrame(tm.TestCase, SharedWithSparse):
     def test_astype(self):
         self.assertRaises(Exception, self.frame.astype, np.int64)
 
+    def test_sparse_comparison(self):
+        df = pd.DataFrame(np.zeros((4, 5), dtype=int))
+        df[1][1] = 1
+        sparse = df.to_sparse()
+        tm.assert_frame_equal(sparse.loc[[1]] != 0, df.loc[[1]] != 0)
+
+
     def test_fillna(self):
         df = self.zframe.reindex(lrange(5))
         dense = self.zorig.reindex(lrange(5))
